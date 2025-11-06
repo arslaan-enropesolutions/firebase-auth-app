@@ -3,7 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://arslaan-enropesolutions.github.io/firebase-auth-app/",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
