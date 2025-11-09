@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect } from "react";
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -12,6 +12,8 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { toast } from "sonner";
 import type { userType } from "@/lib/types";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { type AppDispatch, type RootState } from "@/store";
 
 //* Type Definitions
 type UserType = userType | null;
@@ -30,30 +32,33 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 //* Provider Component
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<UserType>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useSelector((state: RootState) => state);
+  const dispatch = useDispatch<AppDispatch>();
   const router = useNavigate();
   //* Track Auth State (Firebase Listener)
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       try {
         if (!user) {
-          setUser(null);
+          dispatch({ type: "SETUSER", payload: null });
           router("/login");
           return;
         }
+
         // Step 2: Fetch user data from Firestore
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
         if (!userSnap.exists()) return;
-        const userData: userType = userSnap.data() as userType;
-        console.log(userData);
 
-        setUser(userData);
+        const userData: userType = userSnap.data() as userType;
+
+        dispatch({ type: "SETUSER", payload: userData });
+        router("/");
       } catch (error) {
         console.log(error);
+        router("/login");
       } finally {
-        setLoading(false);
+        dispatch({ type: "SETLOADING", payload: false });
       }
     });
 
@@ -115,12 +120,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signIn = async (data: LoginFormData) => {
-    const id = toast.loading("Registering...");
+    const id = toast.loading("Logging in...");
     try {
       // Step 1: Sign in using Firebase Authentication
       await signInWithEmailAndPassword(auth, data.email, data.password);
 
-      toast.success("Account created successfully!", { id });
+      toast.success("Logged in successfully!", { id });
     } catch (err: any) {
       console.error("SignIn Error:", err);
 
@@ -130,6 +135,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       switch (err.code) {
         case "auth/invalid-email":
           errorMessage = "Invalid email address. Please check and try again.";
+          break;
+        case "auth/invalid-credential":
+          errorMessage = "Incorrect email or password. Please try again.";
           break;
         case "auth/user-disabled":
           errorMessage = "Your account has been disabled. Contact support.";

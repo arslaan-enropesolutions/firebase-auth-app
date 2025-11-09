@@ -1,9 +1,11 @@
 import type { userType } from "@/lib/types";
 import { useUser } from "@/providers/user";
-import { getAllUsers } from "@/services/getUser";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Users } from "lucide-react";
+import ChangeRole from "./buttons/ChangeRole";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "@/config/firebase";
 
 function UserList() {
   const state = useUser();
@@ -11,8 +13,20 @@ function UserList() {
   const [allUsers, setAllUsers] = useState<userType[]>([]);
 
   useEffect(() => {
-    getAllUsers().then(setAllUsers);
-  }, [user]);
+    const usersRef = collection(db, "users");
+
+    // Subscribe to real-time updates
+    const unsubscribe = onSnapshot(usersRef, (snapshot) => {
+      const userList = snapshot.docs.map((doc) => ({
+        ...(doc.data() as userType),
+        uid: doc.id,
+      }));
+      setAllUsers(userList);
+    });
+
+    // Cleanup listener when component unmounts
+    return () => unsubscribe();
+  }, []);
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -47,7 +61,7 @@ function UserList() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
-                  {["Name", "Email", "Role", "ID", "Created"].map((h) => (
+                  {["Name", "Email", "Created", "Role"].map((h) => (
                     <th
                       key={h}
                       className="text-left py-3 px-4 text-sm font-semibold text-gray-700"
@@ -58,37 +72,40 @@ function UserList() {
                 </tr>
               </thead>
               <tbody>
-                {allUsers.map((u) => (
-                  <motion.tr
-                    key={u.uid}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                    className="border-b border-gray-100 hover:bg-gray-50"
-                  >
-                    <td className="py-3 px-4 text-sm text-gray-900">
-                      {u.name}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
-                      {u.email}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getRoleBadgeColor(
-                          u.role
-                        )}`}
-                      >
-                        {u.role.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">{u.uid}</td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
-                      {u.createdAt
-                        ? new Date(u.createdAt).toLocaleDateString()
-                        : "—"}
-                    </td>
-                  </motion.tr>
-                ))}
+                {allUsers
+                  .filter((u) => u.uid !== user.uid)
+                  .map((u) => (
+                    <motion.tr
+                      key={u.uid}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="border-b border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="py-3 px-4 text-sm text-gray-900">
+                        {u.name}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-600">
+                        {u.email}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-600">
+                        {u.createdAt
+                          ? new Date(u.createdAt).toLocaleDateString()
+                          : "—"}
+                      </td>
+                      <td className="py-3 px-4 flex">
+                        <span
+                          className={` grow text-center inline-block px-2 py-1 rounded text-xs font-semibold border ${getRoleBadgeColor(
+                            u.role
+                          )}`}
+                        >
+                          {u.role.toUpperCase()}
+                        </span>
+                        <ChangeRole role={u.role} uid={u.uid} />
+                      </td>
+                      {/* <td className="py-3 px-4 text-sm text-gray-600">{u.uid}</td> */}
+                    </motion.tr>
+                  ))}
               </tbody>
             </table>
           </div>
