@@ -1,18 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Send,
-  Phone,
-  Video,
-  MoreVertical,
-  ArrowLeft,
-  Smile,
-  Paperclip,
-  Mic,
-} from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
 import { useMessages } from "@/providers/chats";
 import { useUser } from "@/providers/user";
 import Chatheader from "@/components/Chatheader";

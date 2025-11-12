@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { useUser } from "@/providers/user";
 import { Mic, Paperclip, Send, Smile } from "lucide-react";
@@ -9,7 +9,7 @@ import { useMessages } from "@/providers/chats";
 export default function ChatFooter() {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [input, setInput] = useState("");
-  const { messages, sendMessage, loading } = useMessages();
+  const { sendMessage } = useMessages();
   const { user } = useUser();
   const handleSend = async () => {
     if (!input.trim() || !user) return;

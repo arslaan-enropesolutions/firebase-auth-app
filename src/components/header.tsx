@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Shield } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import LogoutButton from "./buttons/LogoutButton";
 import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";

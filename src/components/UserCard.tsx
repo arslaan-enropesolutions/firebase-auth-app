@@ -1,26 +1,10 @@
 import { motion } from "framer-motion";
 import { useUser } from "@/providers/user";
 import { Calendar, Mail, Shield, User } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Button } from "./ui/button";
-import LogoutButton from "./buttons/LogoutButton";
 import { Badge } from "./ui/badge";
 function UserCard() {
-  const { user } = useUser();
-
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case "admin":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "employee":
-        return "bg-blue-100 text-blue-800 border-blue-200";
-      case "user":
-        return "bg-green-100 text-green-800 border-green-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-  if (!user) return <></>;
+  const state = useUser();
+  const user = state.user!;
 
   return (
     <motion.div

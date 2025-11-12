@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
-import React from "react";
 import { Button } from "./ui/button";
-import { ArrowLeft, MoreVertical, Phone, Video } from "lucide-react";
+import { MoreVertical, Phone, Video } from "lucide-react";
 import { useUser } from "@/providers/user";
 import { Link } from "react-router-dom";
 
