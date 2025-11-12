@@ -84,7 +84,7 @@ export default function ChatPage() {
                     )}
                     <Badge
                       className={cn(
-                        "p-3 py-2 max-w-xs h-min whitespace-normal break-words"
+                        "p-3 py-2 max-w-1/2 h-min whitespace-normal break-words"
                       )}
                       variant={
                         msg.sender === user?.name ? "outline" : "outline"
