@@ -83,7 +83,9 @@ export default function ChatPage() {
                       <div className="w-8 h-8 shrink-0" /> // Spacer to maintain alignment
                     )}
                     <Badge
-                      className={cn("p-3 py-2")}
+                      className={cn(
+                        "p-3 py-2 max-w-xs h-min whitespace-normal break-words"
+                      )}
                       variant={
                         msg.sender === user?.name ? "outline" : "outline"
                       }
